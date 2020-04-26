@@ -34,6 +34,19 @@ app.post('/users', (req, res) => {
   });
 });
 
+app.put('/users', (req, res) => {
+  let body = req.body;
+  // let sql = 'update users set first_name = "bill" where users.id = 3';
+  is thi possible
+  let sql = 'update users set ? = "peter" where users.id = 3';
+  //[body.col,body.content, Number(body.id)]
+  console.log('sql statmement', sql);
+  db.promise().query(sql, [body.col, Number(body.id)]).then((results) => {
+    console.log('results', results);
+    res.send(results);
+  });
+});
+
 app.get('/users/:id', (req, res) => {
   let getId = Number(req.params.id);
   let query = `select * FROM users WHERE id = ${getId}`;
