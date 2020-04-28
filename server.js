@@ -7,6 +7,8 @@ const app = express();
 
 app.use(express.json());
 
+app.use(express.static('client/dist'));
+
 const db = database.createConnection({
   host : '127.0.0.1',
   user : 'student',
@@ -34,14 +36,20 @@ app.post('/users', (req, res) => {
   });
 });
 
+// "email" : "aaa email",
+// "password" : "aaa password",
+// "location" : "aaa location",
+
+
 app.put('/users', (req, res) => {
   let body = req.body;
   // let sql = 'update users set first_name = "bill" where users.id = 3';
-  is thi possible
-  let sql = 'update users set ? = "peter" where users.id = 3';
+  // is thi possible
+  // let sql = 'update users set ? = "peter" where users.id = 3';
+  let sql = `update users set first_name = "${body.first_name || 'defualt'}", last_name = "${body.last_name || 'default'}", email = "${body.email || 'default'}", password = "${body.password || 'default'}", location = "${body.location || 'default'}" , dept = "${body.dept || 'default'}", is_admin = ${body.is_admin || 0} where users.id = ${body.id}`;
   //[body.col,body.content, Number(body.id)]
   console.log('sql statmement', sql);
-  db.promise().query(sql, [body.col, Number(body.id)]).then((results) => {
+  db.promise().query(sql).then((results) => {
     console.log('results', results);
     res.send(results);
   });
@@ -54,6 +62,14 @@ app.get('/users/:id', (req, res) => {
     res.send(results[0]);
   });
 });
+
+app.get('/getusersposts/:userid', (req, res) =>{
+  let userid = req.params.userid;
+  // let sql = `select * from posts join users on posts.user_id = ${Number(userid)}`;
+  let sql = `select users.first_name, users.last_name, posts.title, posts.body from users join posts on users.id = posts.user_id where posts.user_id = ${userid}`;
+  db.promise().query(sql).then((results) => res.send(results[0]));
+});
+
 
 
 app.delete('/users/:id', (req, res) => {
@@ -75,6 +91,14 @@ app.get('/posts/:id', (req, res) => {
   let query = `select * from posts where id = ${id}`;
   db.promise().query(query).then((results) => {
     res.send(results[0]);
+  });
+});
+
+app.put('/posts', (req, res) => {
+  let body = req.body;
+  let sql = `update posts set title = "${body.title}" , body = "${body.body}"  where id = ${body.id}`;
+  db.promise().query(sql).then((results) => {
+    res.send(results);
   });
 });
 
@@ -104,12 +128,25 @@ app.post('/comments', (req, res) => {
   });
 });
 
+app.put('/comments', (req, res) => {
+  let body = req.body;
+  let sql = `update comments set body = "${body.body}" where id = ${body.id}`;
+  db.promise().query(sql).then(results => res.send(results));
+});
+
 app.get('/comments', (req, res) => {
   let qry = 'select * from comments';
   db.promise().query(qry).then(results => {
     res.send(results[0]);
   });
 });
+
+app.get('/getcommentsonpost/:postid', (req, res) => {
+  let postid = req.params.postid;
+  let sql = `select comments.body ,posts.title, users.first_name, users.last_name from comments join posts on comments.post_id = posts.id join users on users.id = comments.user_id where posts.id = "${postid}"`;
+  db.promise().query(sql).then(results => res.send(results[0]));
+});
+
 
 app.delete('/comments/:id', (req, res) => {
   let id = Number(req.params.id);

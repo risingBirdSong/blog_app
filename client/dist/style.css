@@ -1,0 +1,25 @@
+
+.post {
+  background-color: blueviolet;
+}
+.comment {
+  background-color: palevioletred;
+  margin-left: 20px;
+}
+
+.postsAndComments {
+  margin-left: 50px;
+  width: 600px;
+}
+
+.userform {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  border: 2px solid purple;
+}
+
+.userform p, input {
+  margin: 5px;
+}
+
